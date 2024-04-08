@@ -59,14 +59,14 @@ jobs:
           FIREBASE_CREDENTIALS: ${{ secrets.PRD_FIREBASE_CREDENTIALS }}
         run: |
           terraform plan -lock-timeout=3m --var-file=prod.tfvars -no-color \
-            -var=rds_password=$RDS_PASSWORD \
-            -var=jwt_key=$JWT_KEY \
-            -var=jwt_admin_key=$JWT_ADMIN_KEY \
-            -var=search_master_user_password=$OPEN_SEARCH_PASSWORD \
-            -var=sgis_key=$SGIS_KEY \
-            -var=sgis_secret=$SGIS_SECRET \
-            -var=firebase_projectid=$FIREBASE_PROJECTID \
-            -var=firebase_credentials=$FIREBASE_CREDENTIALS \
+            -var rds_password=$RDS_PASSWORD \
+            -var jwt_key=$JWT_KEY \
+            -var jwt_admin_key=$JWT_ADMIN_KEY \
+            -var search_master_user_password=$OPEN_SEARCH_PASSWORD \
+            -var sgis_key=$SGIS_KEY \
+            -var sgis_secret=$SGIS_SECRET \
+            -var firebase_projectid=$FIREBASE_PROJECTID \
+            -var firebase_credentials=$FIREBASE_CREDENTIALS \
             -out tfplan
 
       - name: Terraform apply

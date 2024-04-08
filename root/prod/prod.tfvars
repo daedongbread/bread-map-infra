@@ -1,17 +1,17 @@
-env    = "22fcd8add483ecfd4ba2731931a1c914ecc86f33"
-github_organization = "22fcd8add483ecfd4ba2731931a1c914ecc86f33"
-domain = "22fcd8add483ecfd4ba2731931a1c914ecc86f33"
+env    = "prod"
+github_organization = "daedongbread"
+domain = "daedongbread.com"
 
 # vpc
 availability_zones = ["ap-northeast-2a", "ap-northeast-2c"]
-vpc_cidr           = "22fcd8add483ecfd4ba2731931a1c914ecc86f33"
+vpc_cidr           = "172.31.0.0/16"
 
 # ec2
-instance_type    = "22fcd8add483ecfd4ba2731931a1c914ecc86f33"
+instance_type    = "t2.small"
 min_size         = 1
 max_size         = 1
 desired_capacity = 1
-key_pair_name    = "22fcd8add483ecfd4ba2731931a1c914ecc86f33"
+key_pair_name    = "daedong"
 
 # ecs
 api_image_tag = "22fcd8add483ecfd4ba2731931a1c914ecc86f33"
