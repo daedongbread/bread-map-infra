@@ -73,4 +73,4 @@ jobs:
             -var sgis_key=$SGIS_KEY \
             -var sgis_secret=$SGIS_SECRET \
             -var firebase_projectid=$FIREBASE_PROJECTID \
-            -var firebase_credentials=$FIREBASE_CREDENTIALS \
+            -var firebase_credentials="$FIREBASE_CREDENTIALS"
