@@ -52,6 +52,7 @@ jobs:
           RDS_PASSWORD: ${{ secrets.PRD_RDS_PASSWORD }}
           JWT_KEY: ${{ secrets.PRD_JWT_KEY }}
           JWT_ADMIN_KEY: ${{ secrets.PRD_JWT_ADMIN_KEY }}
+          OPEN_SEARCH_USERNAME: $ {{ secrets.PRD_OPEN_SEARCH_USERNAME }}
           OPEN_SEARCH_PASSWORD: ${{ secrets.PRD_OPEN_SEARCH_PASSWORD }}
           SGIS_KEY: ${{ secrets.SGIS_KEY }}
           SGIS_SECRET: ${{ secrets.SGIS_SECRET }}
@@ -59,14 +60,15 @@ jobs:
           FIREBASE_CREDENTIALS: ${{ secrets.PRD_FIREBASE_CREDENTIALS }}
         run: |
           terraform plan -lock-timeout=3m --var-file=prod.tfvars -no-color \
-            -var=rds_password=$RDS_PASSWORD \
-            -var=jwt_key=$JWT_KEY \
-            -var=jwt_admin_key=$JWT_ADMIN_KEY \
-            -var=search_master_user_password=$OPEN_SEARCH_PASSWORD \
-            -var=sgis_key=$SGIS_KEY \
-            -var=sgis_secret=$SGIS_SECRET \
-            -var=firebase_projectid=$FIREBASE_PROJECTID \
-            -var=firebase_credentials=$FIREBASE_CREDENTIALS \
+            -var rds_password=$RDS_PASSWORD \
+            -var jwt_key=$JWT_KEY \
+            -var jwt_admin_key=$JWT_ADMIN_KEY \
+            -var search_master_user_name=$OPEN_SEARCH_USERNAME \
+            -var search_master_user_password=$OPEN_SEARCH_PASSWORD \
+            -var sgis_key=$SGIS_KEY \
+            -var sgis_secret=$SGIS_SECRET \
+            -var firebase_projectid=$FIREBASE_PROJECTID \
+            -var firebase_credentials="$FIREBASE_CREDENTIALS" \
             -out tfplan
 
       - name: Terraform apply

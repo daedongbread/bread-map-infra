@@ -9,7 +9,6 @@ terraform {
 
 provider "aws" {
   region  = "ap-northeast-2"
-  profile = "prod-daedong2"
 }
 
 provider "aws" {
