@@ -57,7 +57,7 @@ jobs:
           RDS_PASSWORD: ${{ secrets.PRD_RDS_PASSWORD }}
           JWT_KEY: ${{ secrets.PRD_JWT_KEY }}
           JWT_ADMIN_KEY: ${{ secrets.PRD_JWT_ADMIN_KEY }}
-          OPEN_SEARCH_USERNAME: $ {{ secrets.OPEN_SEARCH_USERNAME }}
+          OPEN_SEARCH_USERNAME: $ {{ secrets.PRD_OPEN_SEARCH_USERNAME }}
           OPEN_SEARCH_PASSWORD: ${{ secrets.PRD_OPEN_SEARCH_PASSWORD }}
           SGIS_KEY: ${{ secrets.SGIS_KEY }}
           SGIS_SECRET: ${{ secrets.SGIS_SECRET }}
