@@ -57,11 +57,12 @@ jobs:
           RDS_PASSWORD: ${{ secrets.PRD_RDS_PASSWORD }}
           JWT_KEY: ${{ secrets.PRD_JWT_KEY }}
           JWT_ADMIN_KEY: ${{ secrets.PRD_JWT_ADMIN_KEY }}
-          OPEN_SEARCH_USERNAME: $ {{ secrets.PRD_OPEN_SEARCH_USERNAME }}
+          OPEN_SEARCH_USERNAME: $ {{ secrets.OPEN_SEARCH_USERNAME }}
           OPEN_SEARCH_PASSWORD: ${{ secrets.PRD_OPEN_SEARCH_PASSWORD }}
           SGIS_KEY: ${{ secrets.SGIS_KEY }}
           SGIS_SECRET: ${{ secrets.SGIS_SECRET }}
           FIREBASE_PROJECTID: ${{ secrets.PRD_FIREBASE_PROJECTID }}
+          FIREBASE_CREDENTIALS: ${{ secrets.PRD_FIREBASE_CREDENTIALS }}
         run: |
           terraform plan -lock-timeout=3m --var-file=prod.tfvars -no-color \
             -var rds_password=$RDS_PASSWORD \
@@ -72,4 +73,4 @@ jobs:
             -var sgis_key=$SGIS_KEY \
             -var sgis_secret=$SGIS_SECRET \
             -var firebase_projectid=$FIREBASE_PROJECTID \
-            -var firebase_credentials="${{ secrets.PRD_FIREBASE_CREDENTIALS }}"
+            -var firebase_credentials=$FIREBASE_CREDENTIALS \
