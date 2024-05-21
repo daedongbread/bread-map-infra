@@ -67,3 +67,21 @@ data "aws_iam_policy_document" "search" {
         ]
     }
 }
+
+resource "terraform_data" "default_index_template" {
+    triggers_replace = [aws_opensearch_domain.search.id]
+    depends_on = [aws_opensearch_domain.search]
+
+    provisioner "local-exec" {
+        command = <<EOT
+        curl -X PUT "https://${aws_opensearch_domain.search.endpoint}/_template/default_template" -H 'Content-Type: application/json' -d'
+        {
+            "index_patterns": ["*"],
+            "settings": {
+                "number_of_shards": 1,
+                "number_of_replicas": 0
+            }
+        }'
+        EOT
+    }
+}
