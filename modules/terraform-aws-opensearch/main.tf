@@ -1,3 +1,10 @@
+locals {
+    default = {
+        number_of_shards = 1
+        number_of_replicas = 0
+    }
+}
+
 resource "aws_opensearch_domain" "search" {
     domain_name    = "${var.env}-daedong-search"
     engine_version = "OpenSearch_2.11"
@@ -68,20 +75,20 @@ data "aws_iam_policy_document" "search" {
     }
 }
 
-resource "terraform_data" "default_index_template" {
+resource "terraform_data" "default_index_template_2" {
     triggers_replace = [aws_opensearch_domain.search.id]
     depends_on = [aws_opensearch_domain.search]
 
     provisioner "local-exec" {
         command = <<EOT
-        curl -X PUT "https://${aws_opensearch_domain.search.endpoint}/_template/default_template" -H 'Content-Type: application/json' -d'
-        {
-            "index_patterns": ["*"],
-            "settings": {
-                "number_of_shards": 1,
-                "number_of_replicas": 0
-            }
-        }'
+            curl -v -X PUT "https://${aws_opensearch_domain.search.endpoint}/_template/default_template" -u '${var.search_master_user_name}:${var.search_master_user_password}' -H 'Content-Type: application/json' -d'
+            {
+                "index_patterns": ["*"],
+                "settings": {
+                    "number_of_shards": ${local.default.number_of_shards},
+                    "number_of_replicas": ${local.default.number_of_replicas}
+                }
+            }'
         EOT
     }
 }
