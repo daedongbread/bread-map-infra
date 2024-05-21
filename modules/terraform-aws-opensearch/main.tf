@@ -78,8 +78,8 @@ resource "terraform_data" "default_index_template" {
         {
             "index_patterns": ["*"],
             "settings": {
-            "number_of_shards": 1,
-            "number_of_replicas": 0
+                "number_of_shards": 1,
+                "number_of_replicas": 0
             }
         }'
         EOT
