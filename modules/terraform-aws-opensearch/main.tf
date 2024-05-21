@@ -74,7 +74,7 @@ resource "terraform_data" "default_index_template" {
 
     provisioner "local-exec" {
         command = <<EOT
-        curl -X PUT "https://${aws_opensearch_domain.search.endpoint}/_template/default_template" -H 'Content-Type: application/json' -d'
+        curl -v -X PUT "https://${aws_opensearch_domain.search.endpoint}/_template/default_template" -u '${var.search_master_user_name}:${var.search_master_user_password}' -H 'Content-Type: application/json' -d'
         {
             "index_patterns": ["*"],
             "settings": {
