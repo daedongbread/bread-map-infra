@@ -1,0 +1,114 @@
+name: stage_CD
+
+on:
+  pull_request:
+    branches:
+      - stage
+    types:
+      - closed
+    paths:
+      - 'modules/**'
+      - 'root/stage/**'
+      - '!modules/READMD.md'
+      - '!root/stage/READMD.md'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ap-northeast-2
+
+permissions:
+  id-token: write
+  contents: read
+  actions: read
+
+jobs:
+  terraform-apply:
+    if: ${{ (github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)) && github.ref == 'refs/heads/stage' }}
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: root/stage
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.STG_AWS_GITHUB_ACTION_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+            terraform_version: 1.7.3
+
+      - name: Terraform init
+        id: init
+        run: terraform init
+
+      - name: Terraform plan
+        env:
+          RDS_PASSWORD: ${{ secrets.STG_RDS_PASSWORD }}
+          JWT_KEY: ${{ secrets.STG_JWT_KEY }}
+          JWT_ADMIN_KEY: ${{ secrets.STG_JWT_ADMIN_KEY }}
+          OPEN_SEARCH_USERNAME: ${{ secrets.STG_OPEN_SEARCH_USERNAME }}
+          OPEN_SEARCH_PASSWORD: ${{ secrets.STG_OPEN_SEARCH_PASSWORD }}
+          SGIS_KEY: ${{ secrets.SGIS_KEY }}
+          SGIS_SECRET: ${{ secrets.SGIS_SECRET }}
+          FIREBASE_PROJECTID: ${{ secrets.STG_FIREBASE_PROJECTID }}
+          FIREBASE_CREDENTIALS: ${{ secrets.STG_FIREBASE_CREDENTIALS }}
+        run: |
+          terraform plan -lock-timeout=3m --var-file=prod.tfvars -no-color \
+            -var rds_password=$RDS_PASSWORD \
+            -var jwt_key=$JWT_KEY \
+            -var jwt_admin_key=$JWT_ADMIN_KEY \
+            -var search_master_user_name=$OPEN_SEARCH_USERNAME \
+            -var search_master_user_password=$OPEN_SEARCH_PASSWORD \
+            -var sgis_key=$SGIS_KEY \
+            -var sgis_secret=$SGIS_SECRET \
+            -var firebase_projectid=$FIREBASE_PROJECTID \
+            -var firebase_credentials="$FIREBASE_CREDENTIALS" \
+            -out tfplan
+
+      - name: Terraform apply
+        run: |
+          terraform apply tfplan
+
+      - name: CD notification to Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          fields: repo,workflow,job
+          custom_payload: |
+            {
+              text: '*[개발 환경]* Terraform Apply',
+              attachments: [{
+                color: '${{ job.status }}' === 'success' ? 'good' : 'danger',
+                fields: [
+                  {
+                    title: 'Result',
+                    value: '${{ job.status }}' === 'success' ? 'Success' : 'Fail',
+                    short: false
+                  },
+                  {
+                    "title": 'Resource',
+                    "value": '${{ contains(github.event.pull_request.body, '[API]') && 'API' || 'Infra' }}',
+                    "short": false
+                  },
+                  {
+                    title: 'Repository',
+                    value: `${process.env.AS_REPO}`,
+                    short: false
+                  },
+                  {
+                    title: 'Action',
+                    value: `${process.env.AS_WORKFLOW}`,
+                    short: false
+                  }
+                ]
+              }]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()

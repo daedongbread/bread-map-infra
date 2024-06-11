@@ -1,0 +1,76 @@
+name: stage_CI
+
+on:
+  pull_request:
+    branches:
+      - stage
+    paths:
+      - 'modules/**'
+      - 'root/stage/**'
+      - '!modules/READMD.md'
+      - '!root/stage/READMD.md'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: ap-northeast-2
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform-validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: root/stage
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.STG_AWS_GITHUB_ACTION_ROLE }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.3
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -recursive -check
+        continue-on-error: true
+
+      - name: Terraform init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform plan
+        env:
+          RDS_PASSWORD: ${{ secrets.STG_RDS_PASSWORD }}
+          JWT_KEY: ${{ secrets.STG_JWT_KEY }}
+          JWT_ADMIN_KEY: ${{ secrets.STG_JWT_ADMIN_KEY }}
+          OPEN_SEARCH_USERNAME: ${{ secrets.STG_OPEN_SEARCH_USERNAME }}
+          OPEN_SEARCH_PASSWORD: ${{ secrets.STG_OPEN_SEARCH_PASSWORD }}
+          SGIS_KEY: ${{ secrets.SGIS_KEY }}
+          SGIS_SECRET: ${{ secrets.SGIS_SECRET }}
+          FIREBASE_PROJECTID: ${{ secrets.STG_FIREBASE_PROJECTID }}
+          FIREBASE_CREDENTIALS: ${{ secrets.STG_FIREBASE_CREDENTIALS }}
+        run: |
+          terraform plan -lock-timeout=3m --var-file=stage.tfvars -no-color \
+            -var rds_password=$RDS_PASSWORD \
+            -var jwt_key=$JWT_KEY \
+            -var jwt_admin_key=$JWT_ADMIN_KEY \
+            -var search_master_user_name=$OPEN_SEARCH_USERNAME \
+            -var search_master_user_password=$OPEN_SEARCH_PASSWORD \
+            -var sgis_key=$SGIS_KEY \
+            -var sgis_secret=$SGIS_SECRET \
+            -var firebase_projectid=$FIREBASE_PROJECTID \
+            -var firebase_credentials="$FIREBASE_CREDENTIALS"
