@@ -59,7 +59,7 @@ jobs:
           FIREBASE_PROJECTID: ${{ secrets.STG_FIREBASE_PROJECTID }}
           FIREBASE_CREDENTIALS: ${{ secrets.STG_FIREBASE_CREDENTIALS }}
         run: |
-          terraform plan -lock-timeout=3m --var-file=prod.tfvars -no-color \
+          terraform plan -lock-timeout=3m --var-file=stage.tfvars -no-color \
             -var rds_password=$RDS_PASSWORD \
             -var jwt_key=$JWT_KEY \
             -var jwt_admin_key=$JWT_ADMIN_KEY \
