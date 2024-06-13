@@ -147,6 +147,31 @@ data "aws_iam_policy_document" "update_image_resize_lambda" {
 #   thumbprint_list = [""] # https://github.com/hashicorp/terraform-provider-aws/issues/32480
 # }
 
+# opensearch
+resource "aws_cloudwatch_log_resource_policy" "opensearch_log_policy" {
+  policy_name     = "OpenSearchService-${var.opensearch_search_domain_name}-logs"
+  policy_document = data.aws_iam_policy_document.opensearch_log_policy.json
+}
+
+data "aws_iam_policy_document" "opensearch_log_policy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["es.amazonaws.com"]
+    }
+
+    actions = [
+      "logs:PutLogEvents",
+      "logs:PutLogEventsBatch",
+      "logs:CreateLogStream"
+    ]
+
+    resources = ["arn:aws:logs:*"] # TODO
+  }
+}
+
 # codeseries
 # data "aws_iam_policy_document" "codebuild_policy" {
 #   statement {

@@ -57,6 +57,11 @@ resource "aws_opensearch_domain" "search" {
     advanced_options = {
         "rest.action.multi.allow_explicit_index" = true
     }
+
+    log_publishing_options {
+        cloudwatch_log_group_arn =var.opensearch_search_log_group_arn
+        log_type                 = "ES_APPLICATION_LOGS"
+    }
 }
 
 data "aws_caller_identity" "current" {}
