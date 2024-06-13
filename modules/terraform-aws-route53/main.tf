@@ -1,15 +1,4 @@
-# terraform {
-#     required_providers {
-#         aws = {
-#             source                = "hashicorp/aws"
-#             version               = "~> 4.0"
-#             configuration_aliases = [ aws.virginia ]
-#         }
-#     }
-# }
-
-resource "aws_acm_certificate" "daedong" { // TODO
-    count = var.env == "prod" ? 1 : 0
+resource "aws_acm_certificate" "daedong" {
     domain_name   = var.domain
     key_algorithm = "RSA_2048"
 
@@ -21,10 +10,6 @@ resource "aws_acm_certificate" "daedong" { // TODO
     validation_method         = "DNS"
 }
 
-data "aws_acm_certificate" "daedong" { // TODO
-    count  = var.env == "stage" ? 1 : 0
-    domain = var.domain
-}
 # resource "aws_acm_certificate" "admin_daedong" { // TODO
 #     provider = aws.virginia
 
@@ -39,13 +24,7 @@ data "aws_acm_certificate" "daedong" { // TODO
 # }
 
 resource "aws_route53_zone" "daedong" {
-    count = var.env == "prod" ? 1 : 0
     force_destroy = false
-    name          = var.domain
-}
-
-data "aws_route53_zone" "daedong" {
-    count = var.env == "stage" ? 1 : 0
     name          = var.domain
 }
 
@@ -54,7 +33,7 @@ resource "aws_route53domains_registered_domain" "daedong" {
     domain_name = var.domain
 
     dynamic "name_server" {
-        for_each = toset(aws_route53_zone.daedong[0].name_servers)
+        for_each = toset(aws_route53_zone.daedong.name_servers)
         content {
             name = name_server.value
         }
@@ -82,29 +61,27 @@ resource "aws_route53_record" "api_daedong_alb" {
 
     name                       = format("%s.%s", "api", "${var.domain}")
     type                       = "A"
-    zone_id                    = var.env == "prod" ? aws_route53_zone.daedong[0].zone_id : data.aws_route53_zone.daedong[0].zone_id
+    zone_id                    = aws_route53_zone.daedong.zone_id
 }
 
 resource "aws_route53_record" "acm_certificate" {
-    for_each = var.env == "prod" ? {
-        for dvo in aws_acm_certificate.daedong[0].domain_validation_options : dvo.domain_name => {
+    for_each = { # TODO : 어차피 같은 값
+        for dvo in aws_acm_certificate.daedong.domain_validation_options : dvo.domain_name => {
             name   = dvo.resource_record_name
             record = dvo.resource_record_value
             type   = dvo.resource_record_type
         }
-    } : {}
+    }
 
     allow_overwrite = true
     name            = each.value.name
     records         = [each.value.record]
     ttl             = 172800
     type            = each.value.type
-    # zone_id         = aws_route53_zone.daedong[0].zone_id
-    zone_id         = var.env == "prod" ? aws_route53_zone.daedong[0].zone_id : data.aws_route53_zone.daedong[0].zone_id
+    zone_id         = aws_route53_zone.daedong.zone_id
 }
 
-resource "aws_acm_certificate_validation" "acm_certificate" { // TODO
-    count = var.env == "prod" ? 1 : 0
-    certificate_arn         = aws_acm_certificate.daedong[0].arn
+resource "aws_acm_certificate_validation" "acm_certificate" {
+    certificate_arn         = aws_acm_certificate.daedong.arn
     validation_record_fqdns = [for record in aws_route53_record.acm_certificate : record.fqdn]
 }
