@@ -28,15 +28,3 @@ variable "rds_identifier" {
 # variable "ecs_batch_task_name" {
 #     type = string
 # }
-
-
-
-
-
-
-
-
-
-
-
-

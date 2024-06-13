@@ -24,5 +24,10 @@ resource "aws_cloudwatch_log_group" "rds_slowquery_log_group" {
 
 # ecs
 resource "aws_cloudwatch_log_group" "ecs_api_log_group" {
-    name = "/ecs/daedong-api" # TODo
+    name = "/ecs/daedong-api" # TODD
+}
+
+# opensearch
+resource "aws_cloudwatch_log_group" "opensearch_search" {
+    name = "/aws/OpenSearchService/domains/${var.env}-daedong-search/application-logs" #TODO
 }

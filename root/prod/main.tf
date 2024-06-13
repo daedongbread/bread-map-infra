@@ -4,6 +4,7 @@ module "iam" {
   env                      = var.env
   image_bucket_arn         = module.s3.image_bucket_arn
   image_resizer_lambda_arn = module.lambda.image_resizer_arn
+  opensearch_search_domain_name = module.opensearch.search_opensearch_domain_name
   # admin_codebuild_log_group_arn = module.cloudwatch.admin_codebuild_log_group_arn
   # admin_codebuild_name = module.codeseries.admin_codebuild_name
 }
@@ -191,6 +192,7 @@ module "opensearch" {
   env = var.env
   search_master_user_name = var.search_master_user_name
   search_master_user_password = var.search_master_user_password
+  opensearch_search_log_group_arn = module.cloudwatch.opensearch_search_log_group_arn
 }
 
 module "sqs" {
