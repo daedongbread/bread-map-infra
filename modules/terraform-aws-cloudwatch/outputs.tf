@@ -13,3 +13,6 @@ output "api_log_group_arn" {
 # output "admin_codebuild_log_group_arn" {
 #     value = aws_cloudwatch_log_group.admin_codebuild_log_group.arn
 # }
+output "opensearch_search_log_group_arn" {
+    value = aws_cloudwatch_log_group.opensearch_search.arn
+}

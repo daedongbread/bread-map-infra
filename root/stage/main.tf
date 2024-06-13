@@ -132,7 +132,6 @@ module "ec2" {
   ecs_security_group_id         = module.security_group.ecs_security_group_id
   ecs_instance_profile_arn      = module.iam.ecs_instance_profile_arn
   ecs_cluster_name              = module.ecs.cluster_name
-  # ecs_cluster_name              = "prod-daedong"
   svc_pub_subnet_ids            = module.vpc.svc_pub_subnet_ids
   min_size                      = var.min_size
   max_size                      = var.max_size

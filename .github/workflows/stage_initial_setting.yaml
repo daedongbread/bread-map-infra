@@ -1,4 +1,4 @@
-name: prod_initial_setting
+name: stage_initial_setting
 
 on:
   workflow_dispatch:
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: global/prod
+        working-directory: global/stage
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: ${{ secrets.PRD_AWS_GITHUB_ACTION_ROLE }}
+          role-to-assume: ${{ secrets.STG_AWS_GITHUB_ACTION_ROLE }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Setup Terraform

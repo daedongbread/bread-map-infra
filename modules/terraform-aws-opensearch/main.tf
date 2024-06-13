@@ -57,6 +57,11 @@ resource "aws_opensearch_domain" "search" {
     advanced_options = {
         "rest.action.multi.allow_explicit_index" = true
     }
+
+    log_publishing_options {
+        cloudwatch_log_group_arn =var.opensearch_search_log_group_arn
+        log_type                 = "ES_APPLICATION_LOGS"
+    }
 }
 
 data "aws_caller_identity" "current" {}
@@ -81,7 +86,7 @@ resource "terraform_data" "default_index_template_2" {
 
     provisioner "local-exec" {
         command = <<EOT
-            curl -v -X PUT "https://${aws_opensearch_domain.search.endpoint}/_template/default_template" -u '${var.search_master_user_name}:${var.search_master_user_password}' -H 'Content-Type: application/json' -d'
+            echo curl -v -X PUT "https://${aws_opensearch_domain.search.endpoint}/_template/default_template" -u "${var.search_master_user_name}:${var.search_master_user_password}" -H "Content-Type: application/json" -d '
             {
                 "index_patterns": ["*"],
                 "settings": {
