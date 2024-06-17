@@ -14,7 +14,7 @@ desired_capacity = 1
 key_pair_name    = "daedong"
 
 # ecs
-api_image_tag = "5cf3bceba62b607aab488979db84ee506ad54dce"
+api_image_tag = "2a38175d55bfc4e8ef18d9964c51e1e3a88f05b7"
 
 api_cpu = 256 # 0.25 vCPU
 api_memory = 410 # 0.4 GB
